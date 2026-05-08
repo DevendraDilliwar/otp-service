@@ -53,7 +53,7 @@ export const phoneController = {
   verify: async (c: Context) => {
     try {
       const { phone, otp } = await c.req.json();
-      console.log(`[Phone Controller] Received verify request for ${phone} with OTP: ${otp}`);
+      console.log(`[Phone Controller] Received verify request for ${phone}`);
       
       const result = await verifyOTP('phone', phone, otp);
 

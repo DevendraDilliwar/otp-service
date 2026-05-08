@@ -13,6 +13,7 @@ A professional, self-hosted, open-source OTP verification system for both **Phon
 - **ORM**: [Drizzle](https://orm.drizzle.team/)
 - **Cache**: [Redis](https://redis.io/)
 - **Gateways**: Fast2SMS (SMS) & Resend (Email)
+- **Docs**: Swagger UI
 
 ### Frontend
 - **Framework**: [Next.js 15+](https://nextjs.org/)
@@ -21,7 +22,8 @@ A professional, self-hosted, open-source OTP verification system for both **Phon
 
 ## ✨ Features
 - **Dual Channel**: Support for both SMS and Email OTP.
-- **Secure**: Cryptographically strong OTPs and session tokens.
+- **Secure JWT**: Cryptographically strong OTPs and **JWT-based session tokens**.
+- **Interactive API Docs**: Built-in Swagger UI at `/docs`.
 - **Rate Limited**: Built-in protection against brute-force and spamming.
 - **Audit Logs**: Every action is logged to PostgreSQL for auditing.
 - **Session Tracking**: Automatic session generation upon successful verification.

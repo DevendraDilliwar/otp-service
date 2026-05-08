@@ -3,7 +3,9 @@
  * Handles generation, storage in Redis, and verification of OTPs
  */
 
-import { randomInt, randomBytes } from 'crypto';
+import { randomInt } from 'crypto';
+import { SignJWT } from 'jose';
+import { config } from '../config/index.js';
 import redis from '../db/redis.js';
 import { db } from '../db/index.js';
 import { otpLogs, sessions } from '../db/schema.js';
@@ -24,10 +26,20 @@ export function generateOTP(): string {
 }
 
 /**
- * Generates a session token
+ * Generates a session JWT token
  */
-export function generateSessionToken(): string {
-  return 'sess_' + randomBytes(32).toString('hex');
+export async function generateSessionToken(type: OTPType, identifier: string): Promise<string> {
+  const secret = new TextEncoder().encode(config.security.jwtSecret);
+  
+  return await new SignJWT({ 
+    identifier, 
+    type,
+    authorized: true 
+  })
+    .setProtectedHeader({ alg: 'HS256' })
+    .setIssuedAt()
+    .setExpirationTime('7d') // Token valid for 7 days
+    .sign(secret);
 }
 
 /**
@@ -65,7 +77,7 @@ export async function verifyOTP(type: OTPType, identifier: string, otp: string) 
 
   if (storedOtp === otp) {
     await redis.del(key);
-    const token = generateSessionToken();
+    const token = await generateSessionToken(type, identifier);
     
     // Store session in Postgres using Drizzle
     await db.insert(sessions).values({

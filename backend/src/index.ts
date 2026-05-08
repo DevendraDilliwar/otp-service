@@ -8,6 +8,7 @@ import { serve } from '@hono/node-server';
 import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
 import { secureHeaders } from 'hono/secure-headers';
+import { swaggerUI } from '@hono/swagger-ui';
 import { config } from './config/index.js';
 import { connectRedis } from './db/redis.js';
 import { initDb } from './db/index.js';
@@ -28,7 +29,75 @@ app.use('/api/*', cors({
 
 // Health check
 app.get('/health', (c) => {
-  return c.json({ success: true, status: 'OK' });
+  return c.json({ status: 'ok', environment: config.nodeEnv });
+});
+
+// Swagger Documentation
+app.get('/docs', swaggerUI({ url: '/api-spec' }));
+
+app.get('/api-spec', (c) => {
+  return c.json({
+    openapi: '3.0.0',
+    info: {
+      title: 'OTP Service API',
+      version: '1.0.0',
+      description: 'API for sending and verifying OTPs via Phone and Email',
+    },
+    paths: {
+      '/api/phone/send': {
+        post: {
+          summary: 'Send Phone OTP',
+          requestBody: {
+            content: {
+              'application/json': {
+                schema: { type: 'object', properties: { phone: { type: 'string' } }, required: ['phone'] }
+              }
+            }
+          },
+          responses: { 200: { description: 'OTP Sent' } }
+        }
+      },
+      '/api/phone/verify': {
+        post: {
+          summary: 'Verify Phone OTP',
+          requestBody: {
+            content: {
+              'application/json': {
+                schema: { type: 'object', properties: { phone: { type: 'string' }, otp: { type: 'string' } }, required: ['phone', 'otp'] }
+              }
+            }
+          },
+          responses: { 200: { description: 'Verification Success' } }
+        }
+      },
+      '/api/email/send': {
+        post: {
+          summary: 'Send Email OTP',
+          requestBody: {
+            content: {
+              'application/json': {
+                schema: { type: 'object', properties: { email: { type: 'string' } }, required: ['email'] }
+              }
+            }
+          },
+          responses: { 200: { description: 'OTP Sent' } }
+        }
+      },
+      '/api/email/verify': {
+        post: {
+          summary: 'Verify Email OTP',
+          requestBody: {
+            content: {
+              'application/json': {
+                schema: { type: 'object', properties: { email: { type: 'string' }, otp: { type: 'string' } }, required: ['email', 'otp'] }
+              }
+            }
+          },
+          responses: { 200: { description: 'Verification Success' } }
+        }
+      }
+    }
+  });
 });
 
 // Routes

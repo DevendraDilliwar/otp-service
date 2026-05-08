@@ -53,7 +53,7 @@ export const emailController = {
   verify: async (c: Context) => {
     try {
       const { email, otp } = await c.req.json();
-      console.log(`[Email Controller] Received verify request for ${email} with OTP: ${otp}`);
+      console.log(`[Email Controller] Received verify request for ${email}`);
       
       const result = await verifyOTP('email', email, otp);
 
